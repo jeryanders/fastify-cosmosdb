@@ -21,9 +21,11 @@ let getCosmosDbClient = memoize((config: CosmosClientOptions) => (
   })
 ))
 
-function cosmosDb (fastify: FastifyInstance, options = {}, done: Function) {
+function cosmosDb (fastify: FastifyInstance, options: CosmosClientOptions, done: Function) {
   const cosmosDbClient = getCosmosDbClient(options)
   if (!fastify.cosmosDb) {
-    fastify.
+    fastify.decorate('cosmosDb', cosmosDbClient)
   }
+
+  done();
 }
