@@ -2,11 +2,36 @@
   "name": "fastify-cosmosdb",
   "version": "1.0.0",
   "main": "index.js",
+  "types": "index.d.ts",
   "license": "MIT",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "publish": "npm publish"
+    "test": "tap test.js",
+    "publish:patch": "npm version patch && npm publish",
+    "publish:minor": "npm version minor && npm publish",
+    "publish:major": "npm version major && npm publish"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jeryanders/fastify-cosmosdb.git"
+  },
+  "keywords": [
+    "fastify",
+    "azure",
+    "cosmosdb",
+    "nosql"
+  ],
+  "author": "Jesse Anderson <jeryanders@gmail.com>",
+  "bugs": {
+    "url": "https://github.com/jeryanders/fastify-cosmosdb/issues"
+  },
+  "ts-standard": {
+    "project": "./tsconfig.json",
+    "ignore": [
+      "**/*.js"
+    ]
+  },
+  "homepage": "https://github.com/jeryanders/fastify-cosmosdb#readme",
   "dependencies": {
     "@azure/cosmos": "^3.14.1",
     "fastify": "^3.22.0",
@@ -15,6 +40,9 @@
   "devDependencies": {
     "@tsconfig/node14": "^1.0.1",
     "@types/node": "^16.10.3",
-    "typescript": "^4.4.3"
+    "typescript": "^4.4.3",
+    "tap": "^15.0.10",
+    "@types/tap": "^15.0.5",
+    "ts-standard": "^10.0.0"
   }
 }

@@ -1,4 +1,4 @@
-# fastify-cosmosb
+# fastify-cosmosDb
 
 This plugin shares [@azure/cosmosdb](https://www.npmjs.com/package/@azure/cosmos) object, so you can easy use CosmmosDb with fastify.
 
