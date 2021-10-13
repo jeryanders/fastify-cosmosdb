@@ -1,31 +1,25 @@
 import fp from 'fastify-plugin'
-import { CosmosClient, CosmosClientOptions } from '@azure/cosmos'
-import {FastifyInstance} from 'fastify'
+import { FastifyPluginCallback } from 'fastify'
+import { CosmosClientOptions, CosmosClient } from '@azure/cosmos'
 
-function memoize (func: Function) {
-  const cache = {}
-  return function(n: CosmosClientOptions) {
-    if (cache[n] != undefined) {
-      return cache[n]
-    } else {
-      const result = func(n)
-      cache[n] = result
-      return result
-    }
+declare module 'fastify' {
+  interface FastifyInstance {
+    cosmosDbClient: CosmosClient
   }
 }
 
-let getCosmosDbClient = memoize((config: CosmosClientOptions) => (
-  new CosmosClient({
-    ...config,
-  })
-))
+const getCosmosDbClientFactory = (container) => {
+  const cosmosClient = new CosmosClient(options)
+  // const s
+};
 
-function cosmosDb (fastify: FastifyInstance, options: CosmosClientOptions, done: Function) {
-  const cosmosDbClient = getCosmosDbClient(options)
-  if (!fastify.cosmosDb) {
-    fastify.decorate('cosmosDb', cosmosDbClient)
+// define plugin using callbacks
+const cosmosDb: FastifyPluginCallback<CosmosClientOptions> = (fastify, options, done) => {
+  if (fastify.cosmosDbClient) {
+    fastify.decorate('cosmosDbClient', getCosmosDbClientFactory(options))
   }
 
-  done();
+  done()
 }
+
+export default fp(cosmosDb, '3.x')
