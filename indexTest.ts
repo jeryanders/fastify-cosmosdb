@@ -21,7 +21,8 @@ test('fastify.cosmosDb should exist', (t) => {
 
   server.ready((err) => {
     t.error(err)
-    t.ok(server.cosmosDbClient)
+    t.ok(server.cosmosDbContext)
+    t.ok(server.cosmosDbContainers)
     server.close()
   })
 })
