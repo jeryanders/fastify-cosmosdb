@@ -1,6 +1,6 @@
 {
   "name": "fastify-cosmosdb",
-  "version": "1.0.0",
+  "version": "0.5.0",
   "main": "index.js",
   "types": "index.d.ts",
   "license": "MIT",
@@ -8,9 +8,7 @@
     "build": "tsc -p tsconfig.json",
     "test": "jest",
     "coverage": "jest --coverage",
-    "publish:patch": "npm version patch && npm publish",
-    "publish:minor": "npm version minor && npm publish",
-    "publish:major": "npm version major && npm publish"
+    "publish": "npm run build && npm publish"
   },
   "repository": {
     "type": "git",
@@ -25,12 +23,6 @@
   "author": "Jesse Anderson <jeryanders@gmail.com>",
   "bugs": {
     "url": "https://github.com/jeryanders/fastify-cosmosdb/issues"
-  },
-  "ts-standard": {
-    "project": "./tsconfig.json",
-    "ignore": [
-      "**/*.js"
-    ]
   },
   "homepage": "https://github.com/jeryanders/fastify-cosmosdb#readme",
   "dependencies": {
