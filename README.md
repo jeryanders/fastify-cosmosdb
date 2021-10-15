@@ -7,14 +7,19 @@ This plugin shares [@azure/cosmosdb](https://www.npmjs.com/package/@azure/cosmos
 npm i fastify-cosmosdb -S
 ```
 ## Usage
-Add it to you project with `register` and you are done!  
-You can access the *Azure CosmosClient* via `fastify.cosmosDb`.
+Register plugin with fastify. You can access the containers specified in the `cosmosConfiguration.containerIds` through the `cosmosDbContainers` decorating the fastify server: `fastify.cosmosDbContainers.containerOne.items('id')`
 ```js
 const fastify = require('fastify')
 
-fastify.register(require('fastify-cosmosdb'), {
-    endpoint: 'http://localhost:8000',
-    authKey: 'some-primary-or-secondary-key'
+fastify.register(require('fastify-cosmosdb'), {A
+    cosmosOptions: {
+      endpoint: 'http://localhost:8000',
+      authKey: 'some-primary-or-secondary-key'
+    },
+    cosmosConfiguration: {
+      databaseName: 'database-name',
+      containerIds: [ 'container-one', 'container-two', 'container-three' ]
+    }
   })
 
 fastify.listen(3000, err => {
@@ -29,11 +34,10 @@ In your route file you can simply do all gets, queries, scans e.g.:
 async function singleRoute(fastify, options) {
   fastify.get(
     '/users/:id',
-    (request, reply) => (
-      fastify.cosmosDb.items.create({ name: 'some-document' })
-        .then((response) => response.body)
-        .catch((e) => reply.send(e))
-    ),
+    (request, reply) => {
+      // containers accessible through 'cosmosDbContainers'
+      return fastify.cosmosDbContainers.containerOne.items('item-id', 'partition-key')
+    },
   )
 }
 ```
