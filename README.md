@@ -2,6 +2,10 @@
 
 This plugin shares [@azure/cosmosdb](https://www.npmjs.com/package/@azure/cosmos) object, so you can easy use CosmmosDb with fastify.
 
+This repo is WIP:
+
+- [ ] Publish to NPM
+
 ## Install
 ```
 npm i fastify-cosmosdb -S
