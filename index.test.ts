@@ -1,34 +1,53 @@
 import fastify from 'fastify'
 import fastifyCosmosDb from './index'
 
-const mockContainer = jest.fn().mockReturnValue({})
-const mockContainerList = jest.fn()
+const mockContainer = jest.fn()
   .mockReturnValueOnce({
-    resources: [
-      { id: 'PascalCaseContainerName' },
-      { id: 'camelCaseContainerName' }
-    ]
+    id: 'first-retrieved-container'
   })
   .mockReturnValueOnce({
-    resources: [
-      { id: 'snake-case-container-name' },
-      { id: 'spaced out container name' }
-    ]
+    id: 'second-retrieved-container'
   })
+  .mockReturnValueOnce({
+    id: 'third-retrieved-container'
+  })
+  .mockReturnValueOnce({
+    id: 'fourth-retrieved-container'
+  })
+
+const mockContainerList = {
+  readAll: jest.fn().mockReturnValue({
+    fetchAll: jest.fn()
+      .mockResolvedValueOnce({
+        resources: [
+          { id: 'PascalCaseContainerName' },
+          { id: 'camelCaseContainerName' }
+        ]
+      })
+      .mockResolvedValueOnce({
+        resources: [
+          { id: 'snake-case-container-name' },
+          { id: 'spaced out container name' }
+        ]
+      })
+  })
+}
+
 const mockDatabase = jest.fn().mockReturnValue({
   container: mockContainer,
   containers: mockContainerList
 })
-const mockDatabases = jest.fn().mockReturnValue({
+
+const mockDatabases = {
   readAll: jest.fn().mockReturnValueOnce({
-    fetchAll: jest.fn().mockReturnValueOnce({
+    fetchAll: jest.fn().mockResolvedValue({
       resources: [
         { id: 'database-one' },
         { id: 'database-two' }
       ]
     })
   })
-});
+};
 
 jest.mock('@azure/cosmos', () => {
   class MockCosmosDbClient {
@@ -45,28 +64,32 @@ jest.mock('@azure/cosmos', () => {
   }
 })
 
-describe('pluginn tests', () => {
+describe('plugin tests', () => {
   describe('without filtering', () => {
     const server = fastify()
     beforeEach(() => {
-
       return server.register(fastifyCosmosDb, { endpoint: 'cosmos-endpoint' })
     })
 
     it('should create cosmosdb context', () => (
-      expect(server.cosmosDbContext).toBeTruthy()
+      expect(server.cosmos).toBeTruthy()
     ))
 
-    it('should create cosmosdb containers', () => (
-      expect(server.cosmosDbContainers).toBeTruthy()
+    it('expected to read all databases', () => (
+      expect(mockDatabases.readAll).toHaveBeenCalled()
     ))
 
     it('should call database with configuration', () => (
-      expect(mockDatabase).toHaveBeenCalledWith('database-name')
+      expect(mockContainer.mock.calls).toEqual([
+        ['PascalCaseContainerName'],
+        ['camelCaseContainerName'],
+        ['snake-case-container-name'],
+        ['spaced out container name']
+      ])
     ))
 
     it('should camelize all container names as properties on container context', () => (
-      expect(server.cosmosDbContainers).toEqual({
+      expect(server.cosmos).toEqual({
         pascalCaseContainerName: {},
         camelCaseContainerName: {},
         snakeCaseContainerName: {},
