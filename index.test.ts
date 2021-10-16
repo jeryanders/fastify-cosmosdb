@@ -90,10 +90,22 @@ describe('plugin tests', () => {
 
     it('should camelize all container names as properties on container context', () => (
       expect(server.cosmos).toEqual({
-        pascalCaseContainerName: {},
-        camelCaseContainerName: {},
-        snakeCaseContainerName: {},
-        spacedOutContainerName: {}
+        "databaseOne": {
+          "camelCaseContainerName": {
+            "id": "second-retrieved-container",
+          },
+          "pascalCaseContainerName":{
+            "id": "first-retrieved-container",
+          },
+        },
+        "databaseTwo": {
+          "snakeCaseContainerName": {
+            "id": "third-retrieved-container",
+          },
+          "spacedOutContainerName": {
+            "id": "fourth-retrieved-container",
+          },
+        }
       })
     ));
   })

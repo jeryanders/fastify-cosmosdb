@@ -8,7 +8,7 @@ import type { CosmosClientOptions } from '@azure/cosmos'
 const cosmosDbContext: FastifyPluginCallback<CosmosClientOptions> = (fastify, options, done) => {
   if (!fastify.cosmos) {
     return context(options)
-      .then((cosmos: any) => {
+      .then((cosmos) => {
         fastify.decorate('cosmos', cosmos)
         done()
       })
