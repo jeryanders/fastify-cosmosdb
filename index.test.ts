@@ -46,14 +46,11 @@ jest.mock('@azure/cosmos', () => {
 })
 
 describe('pluginn tests', () => {
-  describe('successful scenarios', () => {
+  describe('without filtering', () => {
     const server = fastify()
     beforeEach(() => {
 
-      return server.register(fastifyCosmosDb, {
-        cosmosOptions: { endpoint: 'cosmos-endpoint' },
-        cosmosConfiguration: { databaseName: 'database-name', containerIds: ['', '', '', ''] }
-      })
+      return server.register(fastifyCosmosDb, { endpoint: 'cosmos-endpoint' })
     })
 
     it('should create cosmosdb context', () => (

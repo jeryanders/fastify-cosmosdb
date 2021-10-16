@@ -1,19 +1,5 @@
-import { CosmosClient, CosmosClientOptions, DatabaseDefinition, Resource, FeedResponse, Container } from "@azure/cosmos";
-
-const normalizeSnakeCase = (str: string) => {
-  return str.split('-').map((word: string, index: number) => {
-    if (index === 0) return word.toLowerCase()
-
-    return word.slice(0, 1).toUpperCase() + word.slice(1).toLowerCase()
-  }).join('');
-}
-
-const camelize = (str: string) => {
-  if (str.indexOf('-') > 0) return normalizeSnakeCase(str)
-  return str.replace(/(?:^\w|[A-Z ]|\b\w)/g, function (word: string, index: number) {
-    return index === 0 ? word.toLowerCase() : word.toUpperCase()
-  }).replace(/\s+/g, '')
-}
+import { CosmosClient, CosmosClientOptions, DatabaseDefinition, Resource, FeedResponse } from "@azure/cosmos";
+import { camelize } from '../utils'
 
 const initializeContainer = (client: CosmosClient, databaseId: string) => (containerId: string) => ([
   camelize(containerId),
@@ -31,6 +17,7 @@ const initializeDatabase = (client: CosmosClient) => (databaseId: string) => ([
     })
 ])
 
+// TODO: Find generic constructs that work here. ReturnType of 'any' is not good
 function resolveAll<T> (promises: Promise<T>[]): any{
   return Promise.all(
     promises.map((promise: Promise<T>) => {
@@ -44,14 +31,6 @@ function resolveAll<T> (promises: Promise<T>[]): any{
 
       return promise
     }))
-}
-
-type FastifyContainers = {
-  [key: string]: Container
-}
-
-export type FastifyCosmosDbClient = {
-  [key: string]: FastifyContainers
 }
 
 const processDatabases = (client: CosmosClient) => (databases: FeedResponse<DatabaseDefinition & Resource>): (string | Promise<any>)[][] => {
