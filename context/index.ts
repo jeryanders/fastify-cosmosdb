@@ -23,7 +23,9 @@ const initializeDatabase = (client: CosmosClient) => (databaseId: string) => ([
 // TODO: Find generic constructs that work here. ReturnType of 'any' is not good
 function resolveAll<T> (promises: Promise<T>[]): any{
   return Promise.all(promises.map((promise: any) => (
-    Array.isArray(promise) ? Promise.all(promise) : Promise.resolve(promise)
+    Array.isArray(promise)
+      ? Promise.all(promise)
+      : Promise.resolve(promise)
   )))
 }
 

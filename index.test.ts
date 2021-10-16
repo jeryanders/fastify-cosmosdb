@@ -107,6 +107,9 @@ describe('plugin tests', () => {
           },
         }
       })
-    ));
+    ))
   })
+
+//.  describe('with filtering', () => {
+//.  });
 })
