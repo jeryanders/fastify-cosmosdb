@@ -1,21 +1,20 @@
 # fastify-cosmosDb
 
-This plugin shares [@azure/cosmosdb](https://www.npmjs.com/package/@azure/cosmos) object, so you can easy use CosmmosDb with fastify.
+[![Node.js CI](https://github.com/jeryanders/fastify-cosmosdb/actions/workflows/node.js.yml/badge.svg)](https://github.com/jeryanders/fastify-cosmosdb/actions/workflows/node.js.yml)
 
-This repo is WIP:
-
-- [ ] Publish to NPM
+This plugin shares [@azure/cosmosdb](https://www.npmjs.com/package/@azure/cosmos) object, so you can easy use CosmosDb with fastify.
 
 ## Install
 ```
 npm i fastify-cosmosdb -S
 ```
 ## Usage
-Register plugin with fastify. You can access the containers specified in the `cosmosConfiguration.containerIds` through the `cosmosDbContainers` decorating the fastify server: `fastify.cosmosDbContainers.containerOne.items('id')`
+Register plugin with fastify. You can access the containers specified in the `cosmosConfiguration.containerIds` through the `cosmosDbContainers` decorating the fastify server: `fastify.cosmosDbContainers.containerOne.items('id')`. Plugin will convert all sane container labels to canonical JavaScript camelCasedNames on the main container decoration.
+
 ```js
 const fastify = require('fastify')
 
-fastify.register(require('fastify-cosmosdb'), {A
+fastify.register(require('fastify-cosmosdb'), {
     cosmosOptions: {
       endpoint: 'http://localhost:8000',
       authKey: 'some-primary-or-secondary-key'
@@ -32,7 +31,7 @@ fastify.listen(3000, err => {
 })
 ```
 
-In your route file you can simply do all gets, queries, scans e.g.:
+Register your CosmosDb plugin with the following properties the `cosmosOptions` and the `cosmosConfiguration`. 
 
 ```js
 async function singleRoute(fastify, options) {

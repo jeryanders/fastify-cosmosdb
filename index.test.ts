@@ -2,12 +2,41 @@ import fastify from 'fastify'
 import fastifyCosmosDb from './index'
 
 const mockContainer = jest.fn().mockReturnValue({})
-const mockDatabase = jest.fn().mockReturnValue({ container: mockContainer })
+const mockContainerList = jest.fn()
+  .mockReturnValueOnce({
+    resources: [
+      { id: 'PascalCaseContainerName' },
+      { id: 'camelCaseContainerName' }
+    ]
+  })
+  .mockReturnValueOnce({
+    resources: [
+      { id: 'snake-case-container-name' },
+      { id: 'spaced out container name' }
+    ]
+  })
+const mockDatabase = jest.fn().mockReturnValue({
+  container: mockContainer,
+  containers: mockContainerList
+})
+const mockDatabases = jest.fn().mockReturnValue({
+  readAll: jest.fn().mockReturnValueOnce({
+    fetchAll: jest.fn().mockReturnValueOnce({
+      resources: [
+        { id: 'database-one' },
+        { id: 'database-two' }
+      ]
+    })
+  })
+});
+
 jest.mock('@azure/cosmos', () => {
   class MockCosmosDbClient {
     database
+    databases
     constructor() {
       this.database = mockDatabase
+      this.databases = mockDatabases
     }
   }
 
@@ -23,7 +52,7 @@ describe('pluginn tests', () => {
 
       return server.register(fastifyCosmosDb, {
         cosmosOptions: { endpoint: 'cosmos-endpoint' },
-        cosmosConfiguration: { databaseName: 'database-name', containerIds: ['PascalCaseContainerName', 'camelCaseContainerName', 'snake-case-container-name'] }
+        cosmosConfiguration: { databaseName: 'database-name', containerIds: ['', '', '', ''] }
       })
     })
 
@@ -43,7 +72,8 @@ describe('pluginn tests', () => {
       expect(server.cosmosDbContainers).toEqual({
         pascalCaseContainerName: {},
         camelCaseContainerName: {},
-        snakeCaseContainerName: {}
+        snakeCaseContainerName: {},
+        spacedOutContainerName: {}
       })
     ));
   })
