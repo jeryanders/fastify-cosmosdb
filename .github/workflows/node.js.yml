@@ -4,20 +4,15 @@
 name: Node.js CI
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
 
 jobs:
-  build:
-
+  build-and-test:
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
-        node-version: [12.x, 14.x, 16.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        node-version: [14.x]
 
     steps:
     - uses: actions/checkout@v2
@@ -26,6 +21,18 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'yarn'
-    - run: yarn install --frozen-lockfile
-    - run: yarn run build
+    - run: echo "//registry.npmjs.org/:_authToken="${{ secrets.NPM_ACCESS_TOKEN }} > .npmrc
+    - run: yarn install --frozen-lockfile --non-interactive
+    - run: yarn lint
     - run: yarn test
+    - run: yarn run build
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    strategy:
+      matrix:
+        node-version: [14.x]
+
+    steps:
+    - run: npm publish --non-interactive
