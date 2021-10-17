@@ -31,4 +31,10 @@ jobs:
     - run: yarn lint
     - run: yarn test
     - run: yarn run build
-    - run: yarn publish --non-interactive
+  deploy:
+    on:
+      push:
+        branches:
+          - master
+    steps:
+    - run: npm publish --non-interactive
