@@ -4,6 +4,11 @@ export type FastifyContainers = {
   [key: string]: Container
 }
 
+export type FastifyDatabases = {
+  [key: string]: Database | FastifyContainers
+
+}
+
 export type FastifyCosmosDbClient = {
   [key: string]: FastifyContainers
 }

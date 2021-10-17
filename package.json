@@ -1,14 +1,15 @@
 {
   "name": "fastify-cosmosdb",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "main": "index.js",
   "types": "types/index.ts",
   "license": "MIT",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "jest",
+    "lint": "eslint .",
     "coverage": "jest --coverage",
-    "publish": "npm run build && npm publish"
+    "publish": "npm publish"
   },
   "repository": {
     "type": "git",
