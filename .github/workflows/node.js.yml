@@ -12,7 +12,7 @@ on:
 
 
 jobs:
-  build-and-test:
+  test-build-deploy:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -30,13 +30,5 @@ jobs:
     - run: yarn lint
     - run: yarn test
     - run: yarn run build
-  deploy:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request'
-    strategy:
-      matrix:
-        node-version: [14.x]
-
-    steps:
     - run: npm publish --non-interactive
+      if: github.event_name != 'pull_request'
