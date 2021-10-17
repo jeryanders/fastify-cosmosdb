@@ -4,16 +4,12 @@
 name: Node.js CI
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
 
 jobs:
-  build:
-
+  build-and-test:
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         node-version: [14.x]
@@ -32,9 +28,12 @@ jobs:
     - run: yarn test
     - run: yarn run build
   deploy:
-    on:
-      push:
-        branches:
-          - master
+    needs: build-and-test
+    if: github.ref == 'refs/heads/master'
+    strategy:
+      matrix:
+        node-version: [14.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
     steps:
     - run: npm publish --non-interactive
