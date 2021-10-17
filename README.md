@@ -1,29 +1,20 @@
-# fastify-cosmosDb
+# Fastify-cosmosDb: Your Fastify Plugin for Azure CosmosDb
 
 [![Node.js CI](https://github.com/jeryanders/fastify-cosmosdb/actions/workflows/node.js.yml/badge.svg)](https://github.com/jeryanders/fastify-cosmosdb/actions/workflows/node.js.yml)
 
-This plugin shares [@azure/cosmosdb](https://www.npmjs.com/package/@azure/cosmos) object, so you can easy use CosmosDb with fastify.
+This Fastify plugin interogates your CosmosDb account to determine which containers are available and provides quick access through a Fastify Instance decoration. Currently, if interogates every database in your account. This plugin integrates with [@azure/cosmosdb](https://www.npmjs.com/package/@azure/cosmos).
 
 ## Install
 ```
 npm i fastify-cosmosdb -S
 ```
 ## Usage
-Register plugin with fastify. You can access the containers specified in the `cosmosConfiguration.containerIds` through the `cosmosDbContainers` decorating the fastify server: `fastify.cosmosDbContainers.containerOne.items('id')`. Plugin will convert all sane container labels to canonical JavaScript camelCasedNames on the main container decoration.
+
 
 ```js
 const fastify = require('fastify')
 
-fastify.register(require('fastify-cosmosdb'), {
-    cosmosOptions: {
-      endpoint: 'http://localhost:8000',
-      authKey: 'some-primary-or-secondary-key'
-    },
-    cosmosConfiguration: {
-      databaseName: 'database-name',
-      containerIds: [ 'container-one', 'container-two', 'container-three' ]
-    }
-  })
+fastify.register(require('fastify-cosmosdb'), CosmosClientOptions)
 
 fastify.listen(3000, err => {
   if (err) throw err
@@ -39,7 +30,7 @@ async function singleRoute(fastify, options) {
     '/users/:id',
     (request, reply) => {
       // containers accessible through 'cosmosDbContainers'
-      return fastify.cosmosDbContainers.containerOne.items('item-id', 'partition-key')
+      return fastify.cosmos.someContainer.items('item-id', 'partition-key')
     },
   )
 }
