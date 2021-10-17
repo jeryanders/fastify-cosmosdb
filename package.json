@@ -1,6 +1,6 @@
 {
   "name": "fastify-cosmosdb",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "main": "index.js",
   "types": "types/index.ts",
   "license": "MIT",
