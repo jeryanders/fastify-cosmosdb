@@ -13,7 +13,6 @@ jobs:
     strategy:
       matrix:
         node-version: [14.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
     - uses: actions/checkout@v2
@@ -29,11 +28,11 @@ jobs:
     - run: yarn run build
   deploy:
     needs: build-and-test
+    runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
     strategy:
       matrix:
         node-version: [14.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
     - run: npm publish --non-interactive
