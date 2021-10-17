@@ -30,7 +30,7 @@ jobs:
   deploy:
     needs: build-and-test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name != 'pull_request'
     strategy:
       matrix:
         node-version: [14.x]
