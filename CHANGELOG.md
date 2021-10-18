@@ -1,5 +1,9 @@
 # Fastify-CosmosDb
 
+## v.0.6.4
+
+Version bump for publish
+
 ## v.0.6.3
 
 Added filtering to allow consumers to opt-in databases and containers when initializing plugin
