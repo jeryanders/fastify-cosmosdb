@@ -1,7 +1,7 @@
 import { CosmosClient, DatabaseDefinition, Resource, FeedResponse } from "@azure/cosmos";
 import { camelize } from '../utils'
 
-import type { FastifyCosmosDbClient, DatabaseFilters, FastifyContainers, ContainerFilters, CosmosPluginOptions } from '../types'
+import type { FastifyCosmosDbClient, DatabaseFilters, FastifyContainers, CosmosPluginOptions } from '../types'
 
 // TODO Type ReturnType
 const initializeContainer = (client: CosmosClient, databaseId: string) => (containerId: string) => ([
@@ -61,7 +61,7 @@ const context = ({ clientOptions, databases }: CosmosPluginOptions): Promise<Fas
     .readAll()
     .fetchAll()
     .then(processDatabases(cosmosClient, databases))
-    .then((databases) => Promise.all(databases.map((database: any) => resolveAll<any[][]>(database))))
+    .then((processed) => Promise.all(processed.map((database: any) => resolveAll<any[][]>(database))))
     .then((result: any) => Object.fromEntries(result))
 }
 
