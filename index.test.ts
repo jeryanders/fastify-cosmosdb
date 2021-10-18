@@ -68,7 +68,11 @@ describe('plugin tests', () => {
   describe('without filtering', () => {
     const server = fastify()
     beforeEach(() => {
-      return server.register(fastifyCosmosDb, { endpoint: 'cosmos-endpoint' })
+      return server.register(fastifyCosmosDb, {
+        clientOptions: {
+          endpoint: 'cosmos-endpoint'
+        }
+      })
     })
 
     it('should create cosmosdb context', () => (
@@ -110,6 +114,61 @@ describe('plugin tests', () => {
     ))
   })
 
-//.  describe('with filtering', () => {
-//.  });
+  describe('with filtering', () => {
+    const server = fastify()
+    beforeEach(() => {
+      return server.register(fastifyCosmosDb, {
+        clientOptions: {
+          endpoint: 'cosmos-endpoint'
+        },
+        databases: [
+          {
+            id: 'database-one',
+            containers: {
+              'spaced out container name': true,
+              'snake-case-container-name': true
+            }
+          }
+        ]
+      })
+    })
+
+    it('should create cosmosdb context', () => (
+      expect(server.cosmos).toBeTruthy()
+    ))
+
+    it('expected to read all databases', () => (
+      expect(mockDatabases.readAll).toHaveBeenCalled()
+    ))
+
+    it('should call database with configuration', () => (
+      expect(mockContainer.mock.calls).toEqual([
+        ['PascalCaseContainerName'],
+        ['camelCaseContainerName'],
+        ['snake-case-container-name'],
+        ['spaced out container name']
+      ])
+    ))
+
+    it('should camelize all container names as properties on container context', () => (
+      expect(server.cosmos).toEqual({
+        "databaseOne": {
+          "camelCaseContainerName": {
+            "id": "second-retrieved-container",
+          },
+          "pascalCaseContainerName":{
+            "id": "first-retrieved-container",
+          },
+        },
+        "databaseTwo": {
+          "snakeCaseContainerName": {
+            "id": "third-retrieved-container",
+          },
+          "spacedOutContainerName": {
+            "id": "fourth-retrieved-container",
+          },
+        }
+      })
+    ))
+  });
 })

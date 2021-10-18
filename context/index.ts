@@ -1,7 +1,7 @@
-import { CosmosClient, CosmosClientOptions, DatabaseDefinition, Resource, FeedResponse } from "@azure/cosmos";
+import { CosmosClient, DatabaseDefinition, Resource, FeedResponse } from "@azure/cosmos";
 import { camelize } from '../utils'
 
-import type { FastifyCosmosDbClient, FastifyContainers } from '../types'
+import type { FastifyCosmosDbClient, DatabaseFilters, FastifyContainers, ContainerFilters, CosmosPluginOptions } from '../types'
 
 // TODO Type ReturnType
 const initializeContainer = (client: CosmosClient, databaseId: string) => (containerId: string) => ([
@@ -11,15 +11,21 @@ const initializeContainer = (client: CosmosClient, databaseId: string) => (conta
 ])
 
 // TODO Type ReturnType
-const initializeDatabase = (client: CosmosClient) => (databaseId: string) => ([
+const initializeDatabase = (client: CosmosClient, filters: DatabaseFilters[]) => (databaseId: string) => ([
   camelize(databaseId),
   client.database(databaseId).containers
     .readAll()
     .fetchAll()
     .then(({ resources }) => {
-      const containerIds = resources.map((resource) => resource.id)
-      return containerIds.map((initializeContainer(client, databaseId)));
-    }).then(Object.fromEntries)
+      const resourceIds = resources.map((resource) => resource.id)
+      const databaseFilter = filters.findIndex(({ id }) => id === databaseId);
+      if (databaseFilter > 0) {
+        const { containers } = filters[databaseFilter]
+        return resourceIds.filter((id) => containers[id] === true)
+      }
+      return resourceIds;
+    }).then((containerIds) => containerIds.map((initializeContainer(client, databaseId))))
+      .then(Object.fromEntries)
 ])
 
 function resolveAll<T> (promises: Promise<T>[]): Promise<T[]>{
@@ -28,19 +34,33 @@ function resolveAll<T> (promises: Promise<T>[]): Promise<T[]>{
   )))
 }
 
-const processDatabases = (client: CosmosClient) => (databases: FeedResponse<DatabaseDefinition & Resource>): Promise<(string | Promise<FastifyContainers>)[][]> => {
-  const databaseIds = databases.resources.map((resource) => resource.id)
-  const initializingDatabases = databaseIds.map(initializeDatabase(client))
+type DatabaseContextModel = Promise<(string | Promise<FastifyContainers>)[][]>
+
+const processDatabases = (client: CosmosClient, filters: DatabaseFilters[] = []) =>
+  (databases: FeedResponse<DatabaseDefinition & Resource>): DatabaseContextModel => {
+
+  const filterDatabases = (): string[] => {
+    const resourceIds = databases.resources.map((resource) => resource.id)
+    if (filters && filters.length > 0) {
+      const includeDatabaseIds = filters?.map((database) => database.id)
+
+      return resourceIds.filter((id) => includeDatabaseIds.includes(id))
+    }
+    return resourceIds
+  }
+
+  const filteredDatabases = filterDatabases()
+  const initializingDatabases = filteredDatabases.map(initializeDatabase(client, filters))
   return Promise.all(initializingDatabases)
 }
 
-const context = (options: CosmosClientOptions): Promise<FastifyCosmosDbClient> => {
-  const cosmosClient = new CosmosClient(options)
+const context = ({ clientOptions, databases }: CosmosPluginOptions): Promise<FastifyCosmosDbClient> => {
+  const cosmosClient = new CosmosClient(clientOptions)
 
   return cosmosClient.databases
     .readAll()
     .fetchAll()
-    .then(processDatabases(cosmosClient))
+    .then(processDatabases(cosmosClient, databases))
     .then((databases) => Promise.all(databases.map((database: any) => resolveAll<any[][]>(database))))
     .then((result: any) => Object.fromEntries(result))
 }
