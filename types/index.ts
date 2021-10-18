@@ -1,4 +1,4 @@
-import { Container, Database } from "@azure/cosmos";
+import { Container, Database, CosmosClientOptions } from "@azure/cosmos";
 
 export type FastifyContainers = {
   [key: string]: Container
@@ -11,6 +11,20 @@ export type FastifyDatabases = {
 
 export type FastifyCosmosDbClient = {
   [key: string]: FastifyContainers
+}
+
+export type ContainerFilters = {
+  [key: string]: boolean
+}
+
+export type DatabaseFilters = {
+  id: string
+  containers: ContainerFilters
+}
+
+export type CosmosPluginOptions = {
+  clientOptions: CosmosClientOptions
+  databases?: DatabaseFilters[]
 }
 
 declare module 'fastify' {
